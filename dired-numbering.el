@@ -6,7 +6,7 @@
 ;; Maintainer: Ioannis Canellos <iocanel@gmail.com>
 ;; URL: https://github.com/iocanel/dired-numbering.el
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: files dired convenience
 
 ;; This file is not part of GNU Emacs.
