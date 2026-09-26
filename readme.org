@@ -1,0 +1,102 @@
+* Dired Numbering
+
+[[../../actions/workflows/build.yml/badge.svg]]
+
+A minor mode for reordering and numbering the files of a dired buffer.
+
+I use it to prepare the track order of audio CDs: old car players play files in
+name order, so the order of the CD is the order of the numeric prefixes.
+
+** Installation
+
+This package is not yet published on MELPA or other package repositories.
+
+*** Using elpaca
+
+#+begin_src emacs-lisp
+(use-package dired-numbering
+  :ensure (dired-numbering :host github :repo "iocanel/dired-numbering.el")
+  :commands (dired-numbering-mode))
+#+end_src
+
+*** Using straight
+
+#+begin_src emacs-lisp
+(use-package dired-numbering
+  :straight (dired-numbering :type git :host github :repo "iocanel/dired-numbering.el")
+  :commands (dired-numbering-mode))
+#+end_src
+
+*** Manual installation
+
+1. Clone the repository:
+   #+begin_src bash
+   git clone https://github.com/iocanel/dired-numbering.el.git
+   #+end_src
+
+2. Add to your Emacs configuration:
+   #+begin_src emacs-lisp
+   (add-to-list 'load-path "/path/to/dired-numbering.el")
+   (require 'dired-numbering)
+   #+end_src
+
+** Usage
+
+Open a directory in dired and run =M-x dired-numbering-mode=. The buffer turns
+editable (wdired), but no file is renamed until you commit.
+
+| Key        | Command                     | What it does                                      |
+|------------+-----------------------------+---------------------------------------------------|
+| =M-<up>=   | ~dired-numbering-move-up~   | Move the file one position up                     |
+| =M-<down>= | ~dired-numbering-move-down~ | Move the file one position down                   |
+| =C-c C-r=  | ~dired-numbering-renumber~  | Close gaps in the numbering (01,02,05 → 01,02,03) |
+| =C-c C-c=  | ~wdired-finish-edit~        | Commit the renames to disk                        |
+| =C-c C-k=  | ~wdired-abort-changes~      | Throw the pending renames away                    |
+
+- Files are numbered =01 - name.mp3=. The padding grows with the number of files.
+- Moving a file swaps its number with its neighbour and the two lines swap
+  places, so the buffer always reads in the final order.
+- A directory that is not numbered yet gets numbered in its current order on
+  the first move.
+- After a commit or an abort, just keep moving: the buffer turns editable again.
+
+** The one guarantee
+
+A base name is welded to its file. Moving a track only ever changes its number,
+never the name after it, so the audio of a track can never end up under another
+title.
+
+This is also enforced at commit time. While the mode is on, =C-c C-c= refuses any
+rename that would change more than the number, and nothing touches the disk.
+Disable the mode to edit names by hand.
+
+** Configuration
+
+- ~dired-numbering-separator~ (default: =" - "=): what goes between the number
+  and the name.
+- ~dired-numbering-min-width~ (default: =2=): minimum number of digits.
+
+A name that already starts with a number and the separator (=1999 - Song.mp3=)
+is read as numbered.
+
+** Development
+
+#+begin_src bash
+make ci            # package, install, compile, checkdoc, package-lint and tests
+make test          # just the tests
+make test-record   # record a green run below (clean tree only)
+#+end_src
+
+The tests build real directories where every file holds its own base name,
+drive the mode and commit to disk, then check that every file still holds the
+name its filename shows. They go from one file up to randomized sequences
+checked against a model.
+
+** Test status
+
+| Date (Europe/Athens) | Commit | Result | Duration |
+|---+---+---+---|
+
+** Requirements
+
+- Emacs 28.1 or newer
